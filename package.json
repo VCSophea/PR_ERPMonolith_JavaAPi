@@ -1,7 +1,7 @@
 {
-  "name": "sales-monolith",
+  "name": "erp-monolith",
   "version": "1.0.0",
-  "description": "Sales ERP Monolith",
+  "description": "ERP Monolith API",
   "scripts": {
     "build": "mvn clean package -DskipTests -q",
     "build:qa": "node scripts/build.js qa",

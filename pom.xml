@@ -9,10 +9,10 @@
 		<relativePath/> 
 	</parent>
 	<groupId>com.udaya</groupId>
-	<artifactId>sales-monolith</artifactId>
+	<artifactId>erp-monolith</artifactId>
 	<version>1.0.0</version>
-	<name>Sales ERP Monolith</name>
-	<description>Sales ERP Monolith</description>
+	<name>ERP Monolith API</name>
+	<description>ERP Monolith API</description>
 	<url/>
 	<licenses>
 		<license/>

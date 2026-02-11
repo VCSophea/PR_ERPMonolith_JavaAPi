@@ -2,6 +2,7 @@ package com.udaya.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.udaya.exception.ApiError;
+import com.udaya.security.CustomUserDetails;
 import com.udaya.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,62 +12,79 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final ObjectMapper objectMapper;
-    private final JwtUtil jwtUtil;
+	private final ObjectMapper objectMapper;
+	private final JwtUtil jwtUtil;
 
-    // * Public Endpoints
-    private static final List<String> PUBLIC_URLS = List.of(
-            "/swagger-ui.html", "/swagger-ui", "/v3/api-docs", "/api-docs",
-            "/swagger-resources", "/webjars", "/api/v1/auth/login",
-            "/actuator"
-    );
+	private static final List<String> PUBLIC_URLS = List.of("/swagger-ui.html", "/swagger-ui", "/v3/api-docs", "/api-docs", "/swagger-resources", "/webjars", "/auth/login", "/auth/register", "/actuator");
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		// * Skip public URLs
+		if (PUBLIC_URLS.stream()
+		               .anyMatch(request.getServletPath()::startsWith)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        // * Skip Public URLs
-        if (PUBLIC_URLS.stream().anyMatch(request.getRequestURI()::startsWith)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			sendError(response, HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header", request);
+			return;
+		}
 
-        // * Extract & Validate Token
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(response, HttpStatus.UNAUTHORIZED, "Missing or Invalid Token", request);
-            return;
-        }
+		try {
+			String token = authHeader.substring(7);
+			String username = jwtUtil.extractUsername(token);
 
-        try {
-            String token = authHeader.substring(7);
-            String username = jwtUtil.extractUsername(token);
-            
-            if (username == null || username.isEmpty()) throw new Exception("Invalid Token Subject");
-            
-            // * Token Valid -> Proceed
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-             sendError(response, HttpStatus.UNAUTHORIZED, "Token Verification Failed: " + e.getMessage(), request);
-        }
-    }
+			if (username != null && SecurityContextHolder.getContext()
+			                                             .getAuthentication() == null) {
+				if (jwtUtil.isTokenValid(token, username)) {
+					// * Extract userId and groups from JWT
+					Long userId = jwtUtil.extractUserId(token);
+					List<String> groups = jwtUtil.extractGroups(token);
+					if (groups == null) groups = Collections.emptyList();
 
-    private void sendError(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
-        response.setStatus(status.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        ApiError apiError = new ApiError(status, message, request.getRequestURI());
-        response.getWriter().write(objectMapper.writeValueAsString(apiError));
-    }
+					CustomUserDetails userDetails = new CustomUserDetails(userId, username, "", groups, true);
+
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext()
+					                     .setAuthentication(authToken);
+				}
+			}
+
+			filterChain.doFilter(request, response);
+		} catch (Exception e) {
+			SecurityContextHolder.clearContext();
+			sendError(response, HttpStatus.UNAUTHORIZED, "Token verification failed: " + e.getMessage(), request);
+		}
+	}
+
+	private void sendError(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
+		response.setStatus(status.value());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		ApiError apiError = ApiError.builder()
+		                            .status(status)
+		                            .message(message)
+		                            .errors(List.of(message))
+		                            .path(request.getRequestURI())
+		                            .build();
+		response.getWriter()
+		        .write(objectMapper.writeValueAsString(apiError));
+	}
 }

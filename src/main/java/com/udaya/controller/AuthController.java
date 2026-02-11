@@ -13,17 +13,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Auth management APIs")
 public class AuthController {
 
-    private final AuthService authService;
+	private final AuthService authService;
 
-    @PostMapping("/login")
-    @Operation(summary = "User Login", description = "Authenticate user and return JWT token")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        // * Delegate to service
-        return ResponseEntity.ok(authService.login(request));
-    }
+	@PostMapping("/login")
+	@Operation(summary = "User Login", description = "Authenticate user and return JWT token")
+	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+		// * Delegate to service
+		return ResponseEntity.ok(authService.login(request));
+	}
+
+	@PostMapping("/register")
+	@Operation(summary = "User Register", description = "Register new user (Public)")
+	public ResponseEntity<com.udaya.model.User> register(@RequestBody com.udaya.model.User user) {
+		return ResponseEntity.ok(authService.register(user));
+	}
 }

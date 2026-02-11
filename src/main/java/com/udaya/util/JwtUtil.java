@@ -14,56 +14,68 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret-key:5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437}")
-    private String secretKey;
+	@Value("${jwt.secret-key}")
+	private String secretKey;
 
-    @Value("${jwt.expiration:86400000}") // 1 day
-    private long jwtExpiration;
+	@Value("${jwt.expiration}")
+	private long jwtExpiration;
 
-    // * Generate Token
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(getSigningKey())
-                .compact();
-    }
+	// * Generate JWT with userId, username, role, and groups
+	public String generateToken(Long userId, String username, String role, java.util.List<String> groups) {
+		return Jwts.builder()
+		           .subject(username)
+		           .claim("userId", userId)
+		           .claim("role", role)
+		           .claim("groups", groups)
+		           .issuedAt(new Date(System.currentTimeMillis()))
+		           .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+		           .signWith(getSigningKey())
+		           .compact();
+	}
 
-    // * Extract Username
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
+	public String generateToken(String username, String role, java.util.List<String> groups) {
+		return generateToken(null, username, role, groups);
+	}
 
-    // * Validate Token
-    public boolean isTokenValid(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
-    }
+	public String extractUsername(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
+	public String extractRole(String token) {
+		return extractClaim(token, claims -> claims.get("role", String.class));
+	}
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
+	public Long extractUserId(String token) {
+		Number userId = extractClaim(token, claims -> claims.get("userId", Number.class));
+		return userId != null ? userId.longValue() : null;
+	}
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
+	@SuppressWarnings("unchecked")
+	public java.util.List<String> extractGroups(String token) {
+		return extractClaim(token, claims -> claims.get("groups", java.util.List.class));
+	}
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
+	public boolean isTokenValid(String token, String username) {
+		return extractUsername(token).equals(username) && !isTokenExpired(token);
+	}
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+	private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+		return claimsResolver.apply(extractAllClaims(token));
+	}
+
+	private Claims extractAllClaims(String token) {
+		return Jwts.parser()
+		           .verifyWith(getSigningKey())
+		           .build()
+		           .parseSignedClaims(token)
+		           .getPayload();
+	}
+
+	private boolean isTokenExpired(String token) {
+		return extractClaim(token, Claims::getExpiration).before(new Date());
+	}
+
+	private SecretKey getSigningKey() {
+		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+	}
 }

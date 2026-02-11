@@ -43,6 +43,13 @@ esac
 
 # set JAVACMD and JAVACCMD
 set_java_home() {
+  # Prefer Java 25 if available to avoid class version mismatch
+  if [ -z "${JAVA_HOME-}" ]; then
+    if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+      JAVA_HOME="$(/usr/libexec/java_home -v25 2>/dev/null || true)"
+    fi
+  fi
+
   # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
   if [ -n "${JAVA_HOME-}" ]; then
     if [ -x "$JAVA_HOME/jre/sh/java" ]; then

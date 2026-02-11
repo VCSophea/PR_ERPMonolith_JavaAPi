@@ -7,7 +7,7 @@ A robust, enterprise-grade Spring Boot Monolithic ERP Application designed with 
 ### 🌟 Core & Architecture
 
 - **Layered Architecture**: Strictly separates `Controller` (API), `Service` (Business Logic), and `Repository` (Data Access via JOOQ).
-- **Java 25 & Spring Boot 3+**: Built on the latest cutting-edge Java ecosystem.
+- **Java 25 runtime & Spring Boot 3.4**: Runs on the newest JDK; code is compiled with release 23 for Spring Boot’s current bytecode support.
 - **MySQL & JOOQ**: Type-safe SQL execution and efficient data handling.
 
 ### 🔐 Security & Authentication
@@ -144,7 +144,7 @@ scripts/            # Build & Ops Scripts (Node.js)
 
 ### Authentication
 
-**Endpoint**: `POST /api/v1/auth/login`
+**Endpoint**: `POST /auth/login`
 **Body**:
 
 ```json

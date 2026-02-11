@@ -1,0 +1,6 @@
+target/original-*.jar
+node_modules
+.git
+.env
+release
+scripts

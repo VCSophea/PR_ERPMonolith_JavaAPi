@@ -1,0 +1,14 @@
+{
+  "name": "sales-monolith",
+  "version": "1.0.0",
+  "description": "Sales ERP Monolith",
+  "scripts": {
+    "build": "mvn clean package -DskipTests -q",
+    "build:qa": "node scripts/build.js qa",
+    "build:prod": "node scripts/build.js prod",
+    "build:docker:local": "node scripts/build.js docker-local",
+    "build:docker:prod": "node scripts/build.js docker-prod",
+    "start": "mvn spring-boot:run",
+    "clean": "mvn clean && rm -rf release"
+  }
+}

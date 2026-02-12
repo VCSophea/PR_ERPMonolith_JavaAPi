@@ -1,6 +1,6 @@
 package com.udaya.security;
 
-import com.udaya.config.CustomPermissionEvaluator;
+import com.udaya.config.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,30 +11,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class PermissionAspect {
 
-	private final CustomPermissionEvaluator permissionEvaluator;
+	private final PermissionChecker permissionChecker;
 
 	@Before("@annotation(com.udaya.security.RequiresPermission)")
 	public void checkPermission(JoinPoint joinPoint) {
-		Authentication authentication = SecurityContextHolder.getContext()
-		                                                     .getAuthentication();
-
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-		Method method = signature.getMethod();
-		RequiresPermission annotation = method.getAnnotation(RequiresPermission.class);
+		RequiresPermission annotation = signature.getMethod().getAnnotation(RequiresPermission.class);
 
 		if (annotation != null) {
 			String module = annotation.module();
-			String action = annotation.action();
+			String action = annotation.action().toUpperCase();
 
-			boolean hasPermission = permissionEvaluator.hasPermission(authentication, module, action);
-			if (!hasPermission) {
+			// * Check permission via PermissionChecker
+			if (!permissionChecker.hasPermission(auth, module, action)) {
 				throw new AccessDeniedException("Access Denied: Missing permission " + module + ":" + action);
 			}
 		}

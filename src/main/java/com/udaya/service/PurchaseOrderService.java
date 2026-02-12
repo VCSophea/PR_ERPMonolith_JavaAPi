@@ -30,8 +30,7 @@ public class PurchaseOrderService {
 
 	// * Get By ID
 	public PurchaseOrder getById(Long id) {
-		return poRepository.findById(id)
-		                   .orElseThrow(() -> new GlobalException("Purchase Order not found", 404));
+		return poRepository.findById(id).orElseThrow(() -> new GlobalException("Purchase Order not found", 404));
 	}
 
 	// * Create

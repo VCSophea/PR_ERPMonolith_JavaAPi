@@ -35,11 +35,7 @@ public class GlobalExceptionHandler {
 	// * Handle Validation Errors
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
-		List<String> errors = ex.getBindingResult()
-		                        .getAllErrors()
-		                        .stream()
-		                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-		                        .toList();
+		List<String> errors = ex.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
 		return buildResponse(HttpStatus.BAD_REQUEST, "Validation Error", errors, request.getRequestURI());
 	}
 
@@ -58,12 +54,7 @@ public class GlobalExceptionHandler {
 	}
 
 	private ResponseEntity<ApiError> buildResponse(HttpStatus status, String message, List<String> errors, String path) {
-		return new ResponseEntity<>(ApiError.builder()
-		                                    .status(status)
-		                                    .message(message)
-		                                    .errors(errors)
-		                                    .path(path)
-		                                    .build(), status);
+		return new ResponseEntity<>(ApiError.builder().status(status).message(message).errors(errors).path(path).build(), status);
 	}
 
 	private ResponseEntity<ApiError> buildResponse(HttpStatus status, String message, String error, String path) {
@@ -74,8 +65,7 @@ public class GlobalExceptionHandler {
 	private void sendTelegramAlert(Exception ex, HttpServletRequest request) {
 		try {
 			telegramUtil.sendErrorNotification(ErrorDetails.builder()
-			                                               .systemActivityId(UUID.randomUUID()
-			                                                                     .toString())
+			                                               .systemActivityId(UUID.randomUUID().toString())
 			                                               .message(ex.getMessage())
 			                                               .endpoint(request.getRequestURI())
 			                                               .username(request.getHeader("X-User-Username") != null ? request.getHeader("X-User-Username") : "Anonymous")

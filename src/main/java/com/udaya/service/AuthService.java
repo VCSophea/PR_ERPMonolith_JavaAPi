@@ -27,8 +27,7 @@ public class AuthService {
 	private final UserService userService;
 
 	public LoginResponse login(LoginRequest request) {
-		User user = userRepository.findByUsername(request.getUsername())
-		                          .orElseThrow(() -> new GlobalException("Invalid credentials", 401));
+		User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new GlobalException("Invalid credentials", 401));
 
 		if (user.getIsActive() == null || user.getIsActive() == 0) {
 			throw new GlobalException("User account is inactive", 403);
@@ -39,13 +38,9 @@ public class AuthService {
 		}
 
 		// * Get user's groups and generate JWT with userId + groups
-		List<String> groupNames = groupService.getUserGroups(user.getId())
-		                                      .stream()
-		                                      .map(Group::getName)
-		                                      .collect(Collectors.toList());
+		List<String> groupNames = groupService.getUserGroups(user.getId()).stream().map(Group::getName).collect(Collectors.toList());
 
-		String sessionId = UUID.randomUUID()
-		                       .toString();
+		String sessionId = UUID.randomUUID().toString();
 		userService.updateUserSession(user.getId(), sessionId, LocalDateTime.now());
 
 		String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole(), groupNames);
@@ -54,12 +49,10 @@ public class AuthService {
 	}
 
 	public User register(User user) {
-		if (userRepository.findByUsername(user.getUsername())
-		                  .isPresent()) {
+		if (userRepository.findByUsername(user.getUsername()).isPresent()) {
 			throw new GlobalException("Username already exists", 400);
 		}
-		if (user.getEmail() != null && userRepository.findByEmail(user.getEmail())
-		                                             .isPresent()) {
+		if (user.getEmail() != null && userRepository.findByEmail(user.getEmail()).isPresent()) {
 			throw new GlobalException("Email already exists", 400);
 		}
 

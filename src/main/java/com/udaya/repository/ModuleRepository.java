@@ -19,38 +19,26 @@ public class ModuleRepository {
 
 	// * Find All Modules
 	public List<Module> findAll() {
-		return dsl.selectFrom(table("modules"))
-		          .orderBy(field("ordering"))
-		          .fetchInto(Module.class);
+		return dsl.selectFrom(table("modules")).orderBy(field("ordering")).fetchInto(Module.class);
 	}
 
 	// * Find by Module Type
 	public List<Module> findByModuleTypeId(Long moduleTypeId) {
-		return dsl.selectFrom(table("modules"))
-		          .where(field("module_type_id").eq(moduleTypeId))
-		          .orderBy(field("ordering"))
-		          .fetchInto(Module.class);
+		return dsl.selectFrom(table("modules")).where(field("module_type_id").eq(moduleTypeId)).orderBy(field("ordering")).fetchInto(Module.class);
 	}
 
 	// * Find by Status
 	public List<Module> findByStatus(Integer status) {
-		return dsl.selectFrom(table("modules"))
-		          .where(field("status").eq(status))
-		          .orderBy(field("ordering"))
-		          .fetchInto(Module.class);
+		return dsl.selectFrom(table("modules")).where(field("status").eq(status)).orderBy(field("ordering")).fetchInto(Module.class);
 	}
 
 	// * Find by Name
 	public Optional<Module> findByName(String name) {
-		return dsl.selectFrom(table("modules"))
-		          .where(field("name").eq(name))
-		          .fetchOptionalInto(Module.class);
+		return dsl.selectFrom(table("modules")).where(field("name").eq(name)).fetchOptionalInto(Module.class);
 	}
 
 	// * Find by ID
 	public Optional<Module> findById(Long id) {
-		return dsl.selectFrom(table("modules"))
-		          .where(field("id").eq(id))
-		          .fetchOptionalInto(Module.class);
+		return dsl.selectFrom(table("modules")).where(field("id").eq(id)).fetchOptionalInto(Module.class);
 	}
 }

@@ -27,46 +27,41 @@ public class PurchaseOrderController {
 
 	@GetMapping
 	@Operation(summary = "Get All POs with Pagination")
-	@RequiresPermission(module = "PURCHASE_ORDER", action = "VIEW")
+	@RequiresPermission(module = "Purchase Order", action = "VIEW")
 	public ResponseEntity<BaseResponse<Object>> getAll(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
 
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id")
-		                                                       .descending());
+		Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
 		Page<PurchaseOrder> poPage = poService.getAll(pageable);
 
-		Pagination pagination = Pagination.builder()
-		                                  .page(page)
-		                                  .rowsPerPage(size)
-		                                  .total(poPage.getTotalElements())
-		                                  .build();
+		Pagination pagination = Pagination.builder().page(page).rowsPerPage(size).total(poPage.getTotalElements()).build();
 
 		return ResponseEntity.ok(BaseResponse.success(poPage.getContent(), pagination));
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Get PO by ID")
-	@RequiresPermission(module = "PURCHASE_ORDER", action = "VIEW")
+	@RequiresPermission(module = "Purchase Order", action = "VIEW")
 	public ResponseEntity<BaseResponse<PurchaseOrder>> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(BaseResponse.success(poService.getById(id)));
 	}
 
 	@PostMapping
 	@Operation(summary = "Create PO")
-	@RequiresPermission(module = "PURCHASE_ORDER", action = "CREATE")
+	@RequiresPermission(module = "Purchase Order", action = "ADD")
 	public ResponseEntity<BaseResponse<PurchaseOrder>> create(@RequestBody PurchaseOrder po) {
 		return ResponseEntity.ok(BaseResponse.success(poService.create(po)));
 	}
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update PO")
-	@RequiresPermission(module = "PURCHASE_ORDER", action = "EDIT")
+	@RequiresPermission(module = "Purchase Order", action = "EDIT")
 	public ResponseEntity<BaseResponse<PurchaseOrder>> update(@PathVariable Long id, @RequestBody PurchaseOrder po) {
 		return ResponseEntity.ok(BaseResponse.success(poService.update(id, po)));
 	}
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Delete PO")
-	@RequiresPermission(module = "PURCHASE_ORDER", action = "DELETE")
+	@RequiresPermission(module = "Purchase Order", action = "DELETE")
 	public ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id) {
 		poService.delete(id);
 		return ResponseEntity.ok(BaseResponse.success(null));

@@ -19,22 +19,17 @@ public class GroupRepository {
 
 	// * Find All Groups
 	public List<Group> findAll() {
-		return dsl.selectFrom(table("groups"))
-		          .fetchInto(Group.class);
+		return dsl.selectFrom(table("groups")).fetchInto(Group.class);
 	}
 
 	// * Find Active Groups
 	public List<Group> findByIsActive(Integer isActive) {
-		return dsl.selectFrom(table("groups"))
-		          .where(field("is_active").eq(isActive))
-		          .fetchInto(Group.class);
+		return dsl.selectFrom(table("groups")).where(field("is_active").eq(isActive)).fetchInto(Group.class);
 	}
 
 	// * Find Group by ID
 	public Optional<Group> findById(Long id) {
-		return dsl.selectFrom(table("groups"))
-		          .where(field("id").eq(id))
-		          .fetchOptionalInto(Group.class);
+		return dsl.selectFrom(table("groups")).where(field("id").eq(id)).fetchOptionalInto(Group.class);
 	}
 
 	// * Save Group

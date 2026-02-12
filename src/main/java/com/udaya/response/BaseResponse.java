@@ -19,19 +19,10 @@ public class BaseResponse<T> {
 	private Pagination pagination;
 
 	public static <T> BaseResponse<T> success(T data) {
-		return BaseResponse.<T>builder()
-		                   .status(HttpStatus.OK.value())
-		                   .message("Success")
-		                   .data(data)
-		                   .build();
+		return BaseResponse.<T>builder().status(HttpStatus.OK.value()).message("Success").data(data).build();
 	}
 
 	public static <T> BaseResponse<T> success(T data, Pagination pagination) {
-		return BaseResponse.<T>builder()
-		                   .status(HttpStatus.OK.value())
-		                   .message("Success")
-		                   .data(data)
-		                   .pagination(pagination)
-		                   .build();
+		return BaseResponse.<T>builder().status(HttpStatus.OK.value()).message("Success").data(data).pagination(pagination).build();
 	}
 }

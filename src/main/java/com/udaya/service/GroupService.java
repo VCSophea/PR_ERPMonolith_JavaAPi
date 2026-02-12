@@ -24,17 +24,11 @@ public class GroupService {
 	}
 
 	public Group getGroupById(Long id) {
-		return groupRepository.findById(id)
-		                      .orElseThrow(() -> new RuntimeException("Group not found"));
+		return groupRepository.findById(id).orElseThrow(() -> new RuntimeException("Group not found"));
 	}
 
 	public List<Group> getUserGroups(Long userId) {
-		return userGroupRepository.findGroupIdsByUserId(userId)
-		                          .stream()
-		                          .map(groupRepository::findById)
-		                          .filter(Optional::isPresent)
-		                          .map(Optional::get)
-		                          .collect(Collectors.toList());
+		return userGroupRepository.findGroupIdsByUserId(userId).stream().map(groupRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
 
 	@Transactional

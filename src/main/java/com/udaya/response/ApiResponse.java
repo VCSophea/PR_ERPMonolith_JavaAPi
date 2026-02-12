@@ -16,18 +16,11 @@ public class ApiResponse<T> {
 
 	// * Static factory for success response
 	public static <T> ApiResponse<T> success(T data) {
-		return ApiResponse.<T>builder()
-		                  .success(true)
-		                  .message("Success")
-		                  .data(data)
-		                  .build();
+		return ApiResponse.<T>builder().success(true).message("Success").data(data).build();
 	}
 
 	// * Static factory for error response
 	public static <T> ApiResponse<T> error(String message) {
-		return ApiResponse.<T>builder()
-		                  .success(false)
-		                  .message(message)
-		                  .build();
+		return ApiResponse.<T>builder().success(false).message(message).build();
 	}
 }

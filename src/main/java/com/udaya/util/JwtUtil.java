@@ -22,15 +22,7 @@ public class JwtUtil {
 
 	// * Generate JWT with userId, username, role, and groups
 	public String generateToken(Long userId, String username, String role, java.util.List<String> groups) {
-		return Jwts.builder()
-		           .subject(username)
-		           .claim("userId", userId)
-		           .claim("role", role)
-		           .claim("groups", groups)
-		           .issuedAt(new Date(System.currentTimeMillis()))
-		           .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-		           .signWith(getSigningKey())
-		           .compact();
+		return Jwts.builder().subject(username).claim("userId", userId).claim("role", role).claim("groups", groups).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + jwtExpiration)).signWith(getSigningKey()).compact();
 	}
 
 	public String generateToken(String username, String role, java.util.List<String> groups) {
@@ -64,11 +56,7 @@ public class JwtUtil {
 	}
 
 	private Claims extractAllClaims(String token) {
-		return Jwts.parser()
-		           .verifyWith(getSigningKey())
-		           .build()
-		           .parseSignedClaims(token)
-		           .getPayload();
+		return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
 	}
 
 	private boolean isTokenExpired(String token) {

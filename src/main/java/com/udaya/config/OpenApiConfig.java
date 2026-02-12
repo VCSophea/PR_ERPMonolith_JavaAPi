@@ -16,16 +16,11 @@ public class OpenApiConfig {
 
 	@Bean
 	public OpenAPI customOpenAPI(@Value("${spring.application.name}") String appName, @Value("${spring.application.version:1.0.0}") String appVersion) {
-		return new OpenAPI().info(new Info().title(appName)
-		                                    .version(appVersion))
-		                    .addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
+		return new OpenAPI().info(new Info().title(appName).version(appVersion)).addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
 	}
 
 	@Bean
 	public GroupedOpenApi publicApi() {
-		return GroupedOpenApi.builder()
-		                     .group("0.ALL APIs")
-		                     .pathsToMatch("/**")
-		                     .build();
+		return GroupedOpenApi.builder().group("0.ALL APIs").pathsToMatch("/**").build();
 	}
 }

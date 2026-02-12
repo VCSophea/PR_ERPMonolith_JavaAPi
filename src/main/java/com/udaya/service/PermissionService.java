@@ -19,25 +19,24 @@ public class PermissionService {
 	private final ModuleRepository moduleRepository;
 
 	public boolean checkUserHasPermission(Long userId, String moduleName) {
-		Module module = moduleRepository.findByName(moduleName)
-		                                .orElse(null);
-		return module != null && permissionRepository.userHasModuleAccess(userId, module.getId());
+		return moduleRepository.findByName(moduleName).map(module -> permissionRepository.userHasModuleAccess(userId, module.getId())).orElse(false);
+	}
+
+	// * Check module + action permission
+	public boolean checkUserHasPermission(Long userId, String moduleName, String action) {
+		if (action == null || moduleName == null || action.trim().isEmpty()) return false;
+
+		// * Current Policy: Module access grants all actions
+		// * We allow ANY action string (e.g. VIEW, ADD, APPROVE, PRINT)
+		return checkUserHasPermission(userId, moduleName);
 	}
 
 	public List<Module> getUserModules(Long userId) {
-		return permissionRepository.findModuleIdsByUserId(userId)
-		                           .stream()
-		                           .map(moduleRepository::findById)
-		                           .filter(Optional::isPresent)
-		                           .map(Optional::get)
-		                           .collect(Collectors.toList());
+		return permissionRepository.findModuleIdsByUserId(userId).stream().map(moduleRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 	}
 
 	public List<Long> getGroupModuleIds(Long groupId) {
-		return permissionRepository.findByGroupId(groupId)
-		                           .stream()
-		                           .map(com.udaya.model.Permission::getModuleId)
-		                           .collect(Collectors.toList());
+		return permissionRepository.findByGroupId(groupId).stream().map(com.udaya.model.Permission::getModuleId).collect(Collectors.toList());
 	}
 
 	@Transactional

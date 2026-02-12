@@ -13,13 +13,11 @@ import java.util.Map;
 @Slf4j
 public class TelegramUtil {
 
+	private final RestTemplate restTemplate = new RestTemplate();
 	@Value("${telegram.bot-token:}")
 	private String botToken;
-
 	@Value("${telegram.chat-id:}")
 	private String chatId;
-
-	private final RestTemplate restTemplate = new RestTemplate();
 
 	public void sendErrorNotification(ErrorDetails error) {
 		if (botToken == null || botToken.isEmpty() || chatId == null || chatId.isEmpty()) {

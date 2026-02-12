@@ -29,22 +29,12 @@ public class PurchaseOrderRepository {
 	public Page<PurchaseOrder> findAll(Pageable pageable) {
 		long total = dsl.fetchCount(table(TABLE_PO));
 
-		List<PurchaseOrder> pos = dsl.selectFrom(table(TABLE_PO))
-		                             .orderBy(field("id").desc())
-		                             .limit(pageable.getPageSize())
-		                             .offset(pageable.getOffset())
-		                             .fetchInto(PurchaseOrder.class);
+		List<PurchaseOrder> pos = dsl.selectFrom(table(TABLE_PO)).orderBy(field("id").desc()).limit(pageable.getPageSize()).offset(pageable.getOffset()).fetchInto(PurchaseOrder.class);
 
 		// * Fetch Items Efficiently
 		if (!pos.isEmpty()) {
-			var poIds = pos.stream()
-			               .map(PurchaseOrder::getId)
-			               .toList();
-			var itemsMap = dsl.selectFrom(table(TABLE_ITEMS))
-			                  .where(field("purchase_order_id").in(poIds))
-			                  .fetchInto(PurchaseOrderItem.class)
-			                  .stream()
-			                  .collect(Collectors.groupingBy(PurchaseOrderItem::getPurchaseOrderId));
+			var poIds = pos.stream().map(PurchaseOrder::getId).toList();
+			var itemsMap = dsl.selectFrom(table(TABLE_ITEMS)).where(field("purchase_order_id").in(poIds)).fetchInto(PurchaseOrderItem.class).stream().collect(Collectors.groupingBy(PurchaseOrderItem::getPurchaseOrderId));
 
 			pos.forEach(po -> po.setItems(itemsMap.getOrDefault(po.getId(), List.of())));
 		}
@@ -54,21 +44,15 @@ public class PurchaseOrderRepository {
 
 	// * Find All (List)
 	public List<PurchaseOrder> findAll() {
-		return dsl.selectFrom(table(TABLE_PO))
-		          .fetchInto(PurchaseOrder.class);
+		return dsl.selectFrom(table(TABLE_PO)).fetchInto(PurchaseOrder.class);
 	}
 
 	// * Find By ID
 	public Optional<PurchaseOrder> findById(Long id) {
-		return dsl.selectFrom(table(TABLE_PO))
-		          .where(field("id").eq(id))
-		          .fetchOptionalInto(PurchaseOrder.class)
-		          .map(po -> {
-			          po.setItems(dsl.selectFrom(table(TABLE_ITEMS))
-			                         .where(field("purchase_order_id").eq(id))
-			                         .fetchInto(PurchaseOrderItem.class));
-			          return po;
-		          });
+		return dsl.selectFrom(table(TABLE_PO)).where(field("id").eq(id)).fetchOptionalInto(PurchaseOrder.class).map(po -> {
+			po.setItems(dsl.selectFrom(table(TABLE_ITEMS)).where(field("purchase_order_id").eq(id)).fetchInto(PurchaseOrderItem.class));
+			return po;
+		});
 	}
 
 	// * Save (Create/Update)
@@ -107,19 +91,15 @@ public class PurchaseOrderRepository {
 			   .execute();
 
 			// * Clear existing items for update
-			dsl.deleteFrom(table(TABLE_ITEMS))
-			   .where(field("purchase_order_id").eq(poId))
-			   .execute();
+			dsl.deleteFrom(table(TABLE_ITEMS)).where(field("purchase_order_id").eq(poId)).execute();
 		}
 
 		// * Batch Insert Items
-		if (po.getItems() != null && !po.getItems()
-		                                .isEmpty()) {
+		if (po.getItems() != null && !po.getItems().isEmpty()) {
 			var insert = dsl.insertInto(table(TABLE_ITEMS), field("sku"), field("product_name"), field("quantity"), field("unit_cost"), field("total_cost"), field("purchase_order_id"));
 
 			Long finalPoId = poId; // effective final
-			po.getItems()
-			  .forEach(item -> insert.values(item.getSku(), item.getProductName(), item.getQuantity(), item.getUnitCost(), item.getTotalCost(), finalPoId));
+			po.getItems().forEach(item -> insert.values(item.getSku(), item.getProductName(), item.getQuantity(), item.getUnitCost(), item.getTotalCost(), finalPoId));
 
 			insert.execute();
 		}
@@ -129,17 +109,12 @@ public class PurchaseOrderRepository {
 
 	// * Delete
 	public void deleteById(Long id) {
-		dsl.deleteFrom(table(TABLE_ITEMS))
-		   .where(field("purchase_order_id").eq(id))
-		   .execute();
-		dsl.deleteFrom(table(TABLE_PO))
-		   .where(field("id").eq(id))
-		   .execute();
+		dsl.deleteFrom(table(TABLE_ITEMS)).where(field("purchase_order_id").eq(id)).execute();
+		dsl.deleteFrom(table(TABLE_PO)).where(field("id").eq(id)).execute();
 	}
 
 	// * Exists
 	public boolean existsById(Long id) {
-		return dsl.fetchCount(dsl.selectFrom(table(TABLE_PO))
-		                         .where(field("id").eq(id))) > 0;
+		return dsl.fetchCount(dsl.selectFrom(table(TABLE_PO)).where(field("id").eq(id))) > 0;
 	}
 }

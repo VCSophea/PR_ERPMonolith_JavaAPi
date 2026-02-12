@@ -5,13 +5,13 @@ import com.udaya.dto.UserResponse;
 import com.udaya.dto.UserUpdateRequest;
 import com.udaya.model.Module;
 import com.udaya.model.User;
+import com.udaya.security.RequiresPermission;
 import com.udaya.service.GroupService;
 import com.udaya.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,13 +30,10 @@ public class UserController {
 	private final PasswordEncoder passwordEncoder;
 
 	@GetMapping
-	@PreAuthorize("hasPermission('USER_MANAGEMENT', 'VIEW')")
+	@RequiresPermission(module = "USER_MANAGEMENT", action = "VIEW")
 	@Operation(summary = "Get all users")
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
-		return ResponseEntity.ok(userService.getAllUsers()
-		                                    .stream()
-		                                    .map(this::toResponse)
-		                                    .collect(Collectors.toList()));
+		return ResponseEntity.ok(userService.getAllUsers().stream().map(this::toResponse).collect(Collectors.toList()));
 	}
 
 	@GetMapping("/{id}")
@@ -46,7 +43,7 @@ public class UserController {
 	}
 
 	@PostMapping
-	@PreAuthorize("hasPermission('USER_MANAGEMENT', 'ADD')")
+	@RequiresPermission(module = "USER_MANAGEMENT", action = "ADD")
 	@Operation(summary = "Create user and assign to groups")
 	public ResponseEntity<UserResponse> createUser(@RequestBody UserCreateRequest request) {
 		// * Create user
@@ -56,15 +53,14 @@ public class UserController {
 
 		// * Assign to groups
 		if (request.getGroupIds() != null) {
-			request.getGroupIds()
-			       .forEach(groupId -> groupService.assignUserToGroup(created.getId(), groupId));
+			request.getGroupIds().forEach(groupId -> groupService.assignUserToGroup(created.getId(), groupId));
 		}
 
 		return ResponseEntity.ok(toResponse(created));
 	}
 
 	@PutMapping("/{id}")
-	@PreAuthorize("hasPermission('USER_MANAGEMENT', 'EDIT')")
+	@RequiresPermission(module = "USER_MANAGEMENT", action = "EDIT")
 	@Operation(summary = "Update user and group assignments")
 	public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
 		request.setId(id);
@@ -72,27 +68,19 @@ public class UserController {
 
 		// * Update group assignments if provided
 		if (request.getGroupIds() != null) {
-			List<Long> currentGroups = groupService.getUserGroups(id)
-			                                       .stream()
-			                                       .map(com.udaya.model.Group::getId)
-			                                       .collect(Collectors.toList());
+			List<Long> currentGroups = groupService.getUserGroups(id).stream().map(com.udaya.model.Group::getId).collect(Collectors.toList());
 
 			currentGroups.forEach(groupId -> groupService.removeUserFromGroup(id, groupId));
-			request.getGroupIds()
-			       .forEach(groupId -> groupService.assignUserToGroup(id, groupId));
+			request.getGroupIds().forEach(groupId -> groupService.assignUserToGroup(id, groupId));
 		}
 
-		return ResponseEntity.ok()
-		                     .build();
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/{id}/groups")
 	@Operation(summary = "Get user's groups")
 	public ResponseEntity<List<String>> getUserGroups(@PathVariable Long id) {
-		return ResponseEntity.ok(groupService.getUserGroups(id)
-		                                     .stream()
-		                                     .map(com.udaya.model.Group::getName)
-		                                     .collect(Collectors.toList()));
+		return ResponseEntity.ok(groupService.getUserGroups(id).stream().map(com.udaya.model.Group::getName).collect(Collectors.toList()));
 	}
 
 	@GetMapping("/{id}/permissions")

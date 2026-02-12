@@ -27,16 +27,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+	private static final List<String> PUBLIC_URLS = List.of("/swagger-ui.html", "/swagger-ui", "/v3/api-docs", "/api-docs", "/swagger-resources", "/webjars", "/auth/login", "/auth/register", "/actuator");
 	private final ObjectMapper objectMapper;
 	private final JwtUtil jwtUtil;
-
-	private static final List<String> PUBLIC_URLS = List.of("/swagger-ui.html", "/swagger-ui", "/v3/api-docs", "/api-docs", "/swagger-resources", "/webjars", "/auth/login", "/auth/register", "/actuator");
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		// * Skip public URLs
-		if (PUBLIC_URLS.stream()
-		               .anyMatch(request.getServletPath()::startsWith)) {
+		if (PUBLIC_URLS.stream().anyMatch(request.getServletPath()::startsWith)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
@@ -51,8 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String token = authHeader.substring(7);
 			String username = jwtUtil.extractUsername(token);
 
-			if (username != null && SecurityContextHolder.getContext()
-			                                             .getAuthentication() == null) {
+			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				if (jwtUtil.isTokenValid(token, username)) {
 					// * Extract userId and groups from JWT
 					Long userId = jwtUtil.extractUserId(token);
@@ -63,8 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext()
-					                     .setAuthentication(authToken);
+					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
 			}
 
@@ -78,13 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void sendError(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
 		response.setStatus(status.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		ApiError apiError = ApiError.builder()
-		                            .status(status)
-		                            .message(message)
-		                            .errors(List.of(message))
-		                            .path(request.getRequestURI())
-		                            .build();
-		response.getWriter()
-		        .write(objectMapper.writeValueAsString(apiError));
+		ApiError apiError = ApiError.builder().status(status).message(message).errors(List.of(message)).path(request.getRequestURI()).build();
+		response.getWriter().write(objectMapper.writeValueAsString(apiError));
 	}
 }

@@ -19,31 +19,22 @@ public class UserRepository {
 
 	// * Find All Users
 	public List<User> findAll() {
-		return dsl.selectFrom(table("users"))
-		          .fetchInto(User.class);
+		return dsl.selectFrom(table("users")).fetchInto(User.class);
 	}
 
 	// * Find User by ID
 	public Optional<User> findById(Long id) {
-		return dsl.selectFrom(table("users"))
-		          .where(field("id").eq(id))
-		          .fetchOptionalInto(User.class);
+		return dsl.selectFrom(table("users")).where(field("id").eq(id)).fetchOptionalInto(User.class);
 	}
 
 	// * Find User by Username
 	public Optional<User> findByUsername(String username) {
-		return dsl.selectFrom(table("users"))
-		          .where(field("username").eq(username))
-		          .limit(1)
-		          .fetchOptionalInto(User.class);
+		return dsl.selectFrom(table("users")).where(field("username").eq(username)).limit(1).fetchOptionalInto(User.class);
 	}
 
 	// * Find User by Email
 	public Optional<User> findByEmail(String email) {
-		return dsl.selectFrom(table("users"))
-		          .where(field("email").eq(email))
-		          .limit(1)
-		          .fetchOptionalInto(User.class);
+		return dsl.selectFrom(table("users")).where(field("email").eq(email)).limit(1).fetchOptionalInto(User.class);
 	}
 
 	// * Save User (Essential fields only for registration)
@@ -84,21 +75,11 @@ public class UserRepository {
 
 	// * Update Session Info
 	public void updateSessionInfo(Long userId, String sessionId, java.time.LocalDateTime sessionStart) {
-		dsl.update(table("users"))
-		   .set(field("session_id"), sessionId)
-		   .set(field("session_start"), sessionStart)
-		   .set(field("session_active"), sessionStart)
-		   .where(field("id").eq(userId))
-		   .execute();
+		dsl.update(table("users")).set(field("session_id"), sessionId).set(field("session_start"), sessionStart).set(field("session_active"), sessionStart).where(field("id").eq(userId)).execute();
 	}
 
 	// * Update Login Attempt
 	public void updateLoginAttempt(Long userId, String remoteIp, String userAgent) {
-		dsl.update(table("users"))
-		   .set(field("login_attempt"), java.time.LocalDateTime.now())
-		   .set(field("login_attempt_remote_ip"), remoteIp)
-		   .set(field("login_attempt_http_user_agent"), userAgent)
-		   .where(field("id").eq(userId))
-		   .execute();
+		dsl.update(table("users")).set(field("login_attempt"), java.time.LocalDateTime.now()).set(field("login_attempt_remote_ip"), remoteIp).set(field("login_attempt_http_user_agent"), userAgent).where(field("id").eq(userId)).execute();
 	}
 }

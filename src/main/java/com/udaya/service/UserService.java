@@ -23,23 +23,19 @@ public class UserService {
 	}
 
 	public User getUserById(Long id) {
-		return userRepository.findById(id)
-		                     .orElseThrow(() -> new GlobalException("User not found", 404));
+		return userRepository.findById(id).orElseThrow(() -> new GlobalException("User not found", 404));
 	}
 
 	public User getUserByUsername(String username) {
-		return userRepository.findByUsername(username)
-		                     .orElseThrow(() -> new GlobalException("User not found", 404));
+		return userRepository.findByUsername(username).orElseThrow(() -> new GlobalException("User not found", 404));
 	}
 
 	@Transactional
 	public User createUser(User user) {
-		if (userRepository.findByUsername(user.getUsername())
-		                  .isPresent()) {
+		if (userRepository.findByUsername(user.getUsername()).isPresent()) {
 			throw new GlobalException("Username already exists", 400);
 		}
-		if (userRepository.findByEmail(user.getEmail())
-		                  .isPresent()) {
+		if (userRepository.findByEmail(user.getEmail()).isPresent()) {
 			throw new GlobalException("Email already exists", 400);
 		}
 		user.setCreated(LocalDateTime.now());

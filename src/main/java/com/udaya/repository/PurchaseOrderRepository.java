@@ -26,10 +26,21 @@ public class PurchaseOrderRepository {
 	private final DSLContext dsl;
 
 	// * Find All with Pagination (Optimized 1+N)
-	public Page<PurchaseOrder> findAll(Pageable pageable) {
-		long total = dsl.fetchCount(table(TABLE_PO));
+	public Page<PurchaseOrder> findAll(Pageable pageable, String keyword) {
+		var baseQuery = dsl.selectFrom(table(TABLE_PO));
+		var countQuery = dsl.selectCount().from(table(TABLE_PO));
 
-		List<PurchaseOrder> pos = dsl.selectFrom(table(TABLE_PO)).orderBy(field("id").desc()).limit(pageable.getPageSize()).offset(pageable.getOffset()).fetchInto(PurchaseOrder.class);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			String likePattern = "%" + keyword.trim() + "%";
+			var condition = field("po_no").likeIgnoreCase(likePattern).or(field("company").likeIgnoreCase(likePattern)).or(field("vendor").likeIgnoreCase(likePattern));
+
+			baseQuery.where(condition);
+			countQuery.where(condition);
+		}
+
+		long total = countQuery.fetchOne(0, Long.class);
+
+		List<PurchaseOrder> pos = baseQuery.orderBy(field("id").desc()).limit(pageable.getPageSize()).offset(pageable.getOffset()).fetchInto(PurchaseOrder.class);
 
 		// * Fetch Items Efficiently
 		if (!pos.isEmpty()) {

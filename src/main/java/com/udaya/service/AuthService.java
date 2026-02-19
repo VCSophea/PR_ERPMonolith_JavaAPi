@@ -1,7 +1,7 @@
 package com.udaya.service;
 
-import com.udaya.dto.LoginRequest;
-import com.udaya.dto.LoginResponse;
+import com.udaya.dto.auth.LoginRequest;
+import com.udaya.dto.auth.LoginResponse;
 import com.udaya.exception.GlobalException;
 import com.udaya.model.Group;
 import com.udaya.model.User;

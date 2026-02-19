@@ -1,6 +1,7 @@
 package com.udaya.controller;
 
 import com.udaya.model.Module;
+import com.udaya.response.BaseResponse;
 import com.udaya.security.RequiresPermission;
 import com.udaya.service.PermissionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,30 +22,30 @@ public class PermissionController {
 
 	@GetMapping("/users/{userId}/modules")
 	@Operation(summary = "Get user's accessible modules")
-	public ResponseEntity<List<Module>> getUserModules(@PathVariable Long userId) {
-		return ResponseEntity.ok(permissionService.getUserModules(userId));
+	public ResponseEntity<BaseResponse<List<Module>>> getUserModules(@PathVariable Long userId) {
+		return ResponseEntity.ok(BaseResponse.success(permissionService.getUserModules(userId)));
 	}
 
 	@GetMapping("/groups/{groupId}/modules")
 	@RequiresPermission(module = "PERMISSION_MANAGEMENT", action = "VIEW")
 	@Operation(summary = "Get group's module IDs")
-	public ResponseEntity<List<Long>> getGroupModuleIds(@PathVariable Long groupId) {
-		return ResponseEntity.ok(permissionService.getGroupModuleIds(groupId));
+	public ResponseEntity<BaseResponse<List<Long>>> getGroupModuleIds(@PathVariable Long groupId) {
+		return ResponseEntity.ok(BaseResponse.success(permissionService.getGroupModuleIds(groupId)));
 	}
 
 	@PostMapping("/groups/{groupId}/modules/{moduleId}")
 	@RequiresPermission(module = "PERMISSION_MANAGEMENT", action = "EDIT")
 	@Operation(summary = "Assign permission to group")
-	public ResponseEntity<Void> assignPermission(@PathVariable Long groupId, @PathVariable Long moduleId) {
+	public ResponseEntity<BaseResponse<Void>> assignPermission(@PathVariable Long groupId, @PathVariable Long moduleId) {
 		permissionService.assignPermissionToGroup(groupId, moduleId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 
 	@DeleteMapping("/groups/{groupId}/modules/{moduleId}")
 	@RequiresPermission(module = "PERMISSION_MANAGEMENT", action = "EDIT")
 	@Operation(summary = "Revoke permission from group")
-	public ResponseEntity<Void> revokePermission(@PathVariable Long groupId, @PathVariable Long moduleId) {
+	public ResponseEntity<BaseResponse<Void>> revokePermission(@PathVariable Long groupId, @PathVariable Long moduleId) {
 		permissionService.revokePermissionFromGroup(groupId, moduleId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 }

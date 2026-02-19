@@ -34,7 +34,7 @@ public class ModuleRepository {
 
 	// * Find by Name
 	public Optional<Module> findByName(String name) {
-		return dsl.selectFrom(table("modules")).where(field("name").eq(name)).fetchOptionalInto(Module.class);
+		return dsl.selectFrom(table("modules")).where(field("name").likeIgnoreCase(name)).fetchOptionalInto(Module.class);
 	}
 
 	// * Find by ID

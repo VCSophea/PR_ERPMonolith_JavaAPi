@@ -1,6 +1,6 @@
 package com.udaya.util;
 
-import com.udaya.dto.ErrorDetails;
+import com.udaya.dto.common.ErrorDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,6 +42,16 @@ public class TelegramUtil {
 	}
 
 	private String buildMessage(ErrorDetails error) {
-		return "*🚨 System Error Alert*\n" + "-------------------------------------\n" + "*. ID:* `" + error.getSystemActivityId() + "`\n" + "*. Message:* " + error.getMessage() + "\n" + "*. Endpoint:* `" + error.getEndpoint() + "`\n" + "*. User:* " + error.getUsername() + "\n" + "*. Time:* " + error.getDateTime() + "\n";
+		String escapedMessage = escapeMarkdown(error.getMessage());
+		if (escapedMessage.length() > 3000) {
+			escapedMessage = escapedMessage.substring(0, 3000) + "... (truncated)";
+		}
+
+		return "*🚨 System Error Alert*\n" + "-------------------------------------\n" + "*. ID:* `" + error.getSystemActivityId() + "`\n" + "*. Message:* " + escapedMessage + "\n" + "*. Endpoint:* `" + error.getEndpoint() + "`\n" + "*. User:* " + escapeMarkdown(error.getUsername()) + "\n" + "*. Time:* " + error.getDateTime() + "\n";
+	}
+
+	private String escapeMarkdown(String text) {
+		if (text == null) return "";
+		return text.replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("`", "\\`");
 	}
 }

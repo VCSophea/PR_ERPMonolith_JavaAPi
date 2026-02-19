@@ -26,7 +26,7 @@ public class PermissionAspect {
 
 		if (annotation != null) {
 			String module = annotation.module();
-			String action = annotation.action().toUpperCase();
+			String action = annotation.action();
 
 			// * Check permission via PermissionChecker
 			if (!permissionChecker.hasPermission(auth, module, action)) {

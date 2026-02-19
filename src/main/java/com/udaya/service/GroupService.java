@@ -19,8 +19,8 @@ public class GroupService {
 	private final GroupRepository groupRepository;
 	private final UserGroupRepository userGroupRepository;
 
-	public List<Group> getAllActiveGroups() {
-		return groupRepository.findByIsActive(1);
+	public List<Group> getAllActiveGroups(String keyword) {
+		return groupRepository.findByIsActive(1, keyword);
 	}
 
 	public Group getGroupById(Long id) {

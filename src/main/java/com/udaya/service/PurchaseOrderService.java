@@ -19,8 +19,8 @@ public class PurchaseOrderService {
 	private final PurchaseOrderRepository poRepository;
 
 	// * Get All with Pagination
-	public Page<PurchaseOrder> getAll(Pageable pageable) {
-		return poRepository.findAll(pageable);
+	public Page<PurchaseOrder> getAll(Pageable pageable, String keyword) {
+		return poRepository.findAll(pageable, keyword);
 	}
 
 	// * Get All (Legacy/Internal)

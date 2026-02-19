@@ -17,9 +17,14 @@ public class UserRepository {
 
 	private final DSLContext dsl;
 
-	// * Find All Users
-	public List<User> findAll() {
-		return dsl.selectFrom(table("users")).fetchInto(User.class);
+	// * Find All Users (with optional keyword)
+	public List<User> findAll(String keyword) {
+		var query = dsl.selectFrom(table("users"));
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			String likePattern = "%" + keyword.trim() + "%";
+			query.where(field("username").likeIgnoreCase(likePattern).or(field("email").likeIgnoreCase(likePattern)).or(field("full_name").likeIgnoreCase(likePattern)));
+		}
+		return query.fetchInto(User.class);
 	}
 
 	// * Find User by ID

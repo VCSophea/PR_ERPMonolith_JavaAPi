@@ -1,4 +1,4 @@
-package com.udaya.dto;
+package com.udaya.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

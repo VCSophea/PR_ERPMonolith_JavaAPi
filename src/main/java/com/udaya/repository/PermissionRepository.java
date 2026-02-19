@@ -33,7 +33,7 @@ public class PermissionRepository {
 
 	// * Get Module IDs for User (via user's groups)
 	public List<Long> findModuleIdsByUserId(Long userId) {
-		return dsl.select(field("module_id")).from(table("permissions")).where(field("group_id").in(dsl.select(field("group_id")).from(table("user_groups")).where(field("user_id").eq(userId)))).fetch(field("module_id"), Long.class);
+		return dsl.selectDistinct(field("module_id")).from(table("permissions")).where(field("group_id").in(dsl.select(field("group_id")).from(table("user_groups")).where(field("user_id").eq(userId)))).fetch(field("module_id"), Long.class);
 	}
 
 	// * Check if User has access to a Module

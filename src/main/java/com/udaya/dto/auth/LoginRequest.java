@@ -1,4 +1,4 @@
-package com.udaya.dto;
+package com.udaya.dto.auth;
 
 import lombok.Data;
 

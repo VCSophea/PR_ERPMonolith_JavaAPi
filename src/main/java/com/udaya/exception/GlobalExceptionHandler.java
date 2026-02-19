@@ -1,6 +1,7 @@
 package com.udaya.exception;
 
-import com.udaya.dto.ErrorDetails;
+import com.udaya.dto.common.ErrorDetails;
+import com.udaya.response.BaseResponse;
 import com.udaya.util.TelegramUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,20 +29,20 @@ public class GlobalExceptionHandler {
 
 	// * Handle No Resource Found
 	@ExceptionHandler(NoResourceFoundException.class)
-	public ResponseEntity<ApiError> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
+	public ResponseEntity<BaseResponse<Object>> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
 		return buildResponse(HttpStatus.NOT_FOUND, "Resource not found", ex.getMessage(), request.getRequestURI());
 	}
 
 	// * Handle Validation Errors
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
+	public ResponseEntity<BaseResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
 		List<String> errors = ex.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
 		return buildResponse(HttpStatus.BAD_REQUEST, "Validation Error", errors, request.getRequestURI());
 	}
 
 	// * Handle General Exceptions
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiError> handleException(Exception ex, HttpServletRequest request) {
+	public ResponseEntity<BaseResponse<Object>> handleException(Exception ex, HttpServletRequest request) {
 		log.error("Exception processing request", ex);
 		sendTelegramAlert(ex, request);
 		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), List.of(ex.getMessage()), request.getRequestURI());
@@ -49,15 +50,17 @@ public class GlobalExceptionHandler {
 
 	// * Handle Global Custom Exceptions
 	@ExceptionHandler(GlobalException.class)
-	public ResponseEntity<ApiError> handleGlobalException(GlobalException ex, HttpServletRequest request) {
+	public ResponseEntity<BaseResponse<Object>> handleGlobalException(GlobalException ex, HttpServletRequest request) {
 		return buildResponse(HttpStatus.valueOf(ex.getStatus()), ex.getMessage(), List.of(ex.getMessage()), request.getRequestURI());
 	}
 
-	private ResponseEntity<ApiError> buildResponse(HttpStatus status, String message, List<String> errors, String path) {
-		return new ResponseEntity<>(ApiError.builder().status(status).message(message).errors(errors).path(path).build(), status);
+	private ResponseEntity<BaseResponse<Object>> buildResponse(HttpStatus status, String message, List<String> errors, String path) {
+		// * Path is not currently in BaseResponse, but we can log it or add it if needed. 
+		// * For now, returning standard response.
+		return new ResponseEntity<>(BaseResponse.error(status, message, errors), status);
 	}
 
-	private ResponseEntity<ApiError> buildResponse(HttpStatus status, String message, String error, String path) {
+	private ResponseEntity<BaseResponse<Object>> buildResponse(HttpStatus status, String message, String error, String path) {
 		return buildResponse(status, message, List.of(error), path);
 	}
 

@@ -1,7 +1,9 @@
 package com.udaya.controller;
 
-import com.udaya.dto.LoginRequest;
-import com.udaya.dto.LoginResponse;
+import com.udaya.dto.auth.LoginRequest;
+import com.udaya.dto.auth.LoginResponse;
+import com.udaya.model.User;
+import com.udaya.response.BaseResponse;
 import com.udaya.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,14 +24,14 @@ public class AuthController {
 
 	@PostMapping("/login")
 	@Operation(summary = "User Login")
-	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+	public ResponseEntity<BaseResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
 		// * Delegate to service
-		return ResponseEntity.ok(authService.login(request));
+		return ResponseEntity.ok(BaseResponse.success(authService.login(request)));
 	}
 
 	@PostMapping("/register")
 	@Operation(summary = "User Register", description = "Register new user (Public)")
-	public ResponseEntity<com.udaya.model.User> register(@RequestBody com.udaya.model.User user) {
-		return ResponseEntity.ok(authService.register(user));
+	public ResponseEntity<BaseResponse<User>> register(@RequestBody User user) {
+		return ResponseEntity.ok(BaseResponse.success(authService.register(user)));
 	}
 }

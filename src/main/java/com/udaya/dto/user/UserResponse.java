@@ -1,5 +1,6 @@
-package com.udaya.dto;
+package com.udaya.dto.user;
 
+import com.udaya.model.ModuleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +13,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreateRequest {
+public class UserResponse {
 
+	private Long id;
 	private String username;
-	private String password;
 	private String email;
-	private List<Long> groupIds;
+	private String role;
 	private String fullName;
 	private String firstName;
 	private String lastName;
@@ -25,4 +26,7 @@ public class UserCreateRequest {
 	private LocalDate dob;
 	private String address;
 	private String telephone;
+	private String photo;
+	private Integer isActive;
+	private List<ModuleType> moduleTypeList;
 }

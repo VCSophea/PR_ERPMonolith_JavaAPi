@@ -1,7 +1,7 @@
 package com.udaya.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.udaya.exception.ApiError;
+import com.udaya.response.BaseResponse;
 import com.udaya.security.CustomUserDetails;
 import com.udaya.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void sendError(HttpServletResponse response, HttpStatus status, String message, HttpServletRequest request) throws IOException {
 		response.setStatus(status.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		ApiError apiError = ApiError.builder().status(status).message(message).errors(List.of(message)).path(request.getRequestURI()).build();
+		BaseResponse<Object> apiError = BaseResponse.error(status, message);
 		response.getWriter().write(objectMapper.writeValueAsString(apiError));
 	}
 }

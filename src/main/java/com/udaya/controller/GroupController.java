@@ -1,6 +1,8 @@
 package com.udaya.controller;
 
+import com.udaya.dto.common.BaseSearchRequest;
 import com.udaya.model.Group;
+import com.udaya.response.BaseResponse;
 import com.udaya.security.RequiresPermission;
 import com.udaya.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,56 +21,57 @@ public class GroupController {
 
 	private final GroupService groupService;
 
-	@GetMapping
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "VIEW")
+	@PostMapping("/list")
+	@RequiresPermission(module = "Group", action = "View")
 	@Operation(summary = "Get all active groups")
-	public ResponseEntity<List<Group>> getAllActiveGroups() {
-		return ResponseEntity.ok(groupService.getAllActiveGroups());
+	public ResponseEntity<BaseResponse<List<Group>>> getAllActiveGroups(@RequestBody(required = false) BaseSearchRequest request) {
+		String keyword = (request != null) ? request.getKeyword() : null;
+		return ResponseEntity.ok(BaseResponse.success(groupService.getAllActiveGroups(keyword)));
 	}
 
 	@GetMapping("/{id}")
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "VIEW")
+	@RequiresPermission(module = "Group", action = "View")
 	@Operation(summary = "Get group by ID")
-	public ResponseEntity<Group> getGroupById(@PathVariable Long id) {
-		return ResponseEntity.ok(groupService.getGroupById(id));
+	public ResponseEntity<BaseResponse<Group>> getGroupById(@PathVariable Long id) {
+		return ResponseEntity.ok(BaseResponse.success(groupService.getGroupById(id)));
 	}
 
 	@PostMapping
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "ADD")
+	@RequiresPermission(module = "Group", action = "Add")
 	@Operation(summary = "Create group")
-	public ResponseEntity<Group> createGroup(@RequestBody Group group) {
-		return ResponseEntity.ok(groupService.createGroup(group));
+	public ResponseEntity<BaseResponse<Group>> createGroup(@RequestBody Group group) {
+		return ResponseEntity.ok(BaseResponse.success(groupService.createGroup(group)));
 	}
 
 	@PutMapping("/{id}")
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "EDIT")
+	@RequiresPermission(module = "Group", action = "Edit")
 	@Operation(summary = "Update group")
-	public ResponseEntity<Void> updateGroup(@PathVariable Long id, @RequestBody Group group) {
+	public ResponseEntity<BaseResponse<Void>> updateGroup(@PathVariable Long id, @RequestBody Group group) {
 		group.setId(id);
 		groupService.updateGroup(group);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 
 	@PostMapping("/{groupId}/users/{userId}")
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "EDIT")
+	@RequiresPermission(module = "Group", action = "Edit")
 	@Operation(summary = "Assign user to group")
-	public ResponseEntity<Void> assignUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+	public ResponseEntity<BaseResponse<Void>> assignUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) {
 		groupService.assignUserToGroup(userId, groupId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 
 	@DeleteMapping("/{groupId}/users/{userId}")
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "EDIT")
+	@RequiresPermission(module = "Group", action = "Edit")
 	@Operation(summary = "Remove user from group")
-	public ResponseEntity<Void> removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+	public ResponseEntity<BaseResponse<Void>> removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) {
 		groupService.removeUserFromGroup(userId, groupId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 
 	@GetMapping("/{groupId}/users")
-	@RequiresPermission(module = "GROUP_MANAGEMENT", action = "VIEW")
+	@RequiresPermission(module = "Group", action = "View")
 	@Operation(summary = "Get group members")
-	public ResponseEntity<List<Long>> getGroupMembers(@PathVariable Long groupId) {
-		return ResponseEntity.ok(groupService.getGroupMembers(groupId));
+	public ResponseEntity<BaseResponse<List<Long>>> getGroupMembers(@PathVariable Long groupId) {
+		return ResponseEntity.ok(BaseResponse.success(groupService.getGroupMembers(groupId)));
 	}
 }

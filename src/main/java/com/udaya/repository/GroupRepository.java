@@ -17,14 +17,15 @@ public class GroupRepository {
 
 	private final DSLContext dsl;
 
-	// * Find All Groups
-	public List<Group> findAll() {
-		return dsl.selectFrom(table("groups")).fetchInto(Group.class);
-	}
+	// * Find Active Groups (with optional keyword)
+	public List<Group> findByIsActive(Integer isActive, String keyword) {
+		var query = dsl.selectFrom(table("groups")).where(field("is_active").eq(isActive));
 
-	// * Find Active Groups
-	public List<Group> findByIsActive(Integer isActive) {
-		return dsl.selectFrom(table("groups")).where(field("is_active").eq(isActive)).fetchInto(Group.class);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			String likePattern = "%" + keyword.trim() + "%";
+			query.and(field("name").likeIgnoreCase(likePattern).or(field("sys_code").likeIgnoreCase(likePattern)));
+		}
+		return query.fetchInto(Group.class);
 	}
 
 	// * Find Group by ID

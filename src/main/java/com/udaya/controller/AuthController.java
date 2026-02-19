@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Auth management APIs")
+@Tag(name = "1. Authentication", description = "Auth management APIs")
 public class AuthController {
 
 	private final AuthService authService;
 
 	@PostMapping("/login")
-	@Operation(summary = "User Login", description = "Authenticate user and return JWT token")
+	@Operation(summary = "User Login")
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
 		// * Delegate to service
 		return ResponseEntity.ok(authService.login(request));

@@ -22,6 +22,7 @@ springdoc:
     tryItOutEnabled: true
     filter: true
     doc-expansion: none
+    tags-sorter: alpha
 
 management:
   endpoints:

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "User Management")
+@Tag(name = "2. User Management")
 public class UserController {
 
 	private final UserService userService;

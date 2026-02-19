@@ -14,8 +14,10 @@ import java.util.Map;
 public class TelegramUtil {
 
 	private final RestTemplate restTemplate = new RestTemplate();
+
 	@Value("${telegram.bot-token:}")
 	private String botToken;
+
 	@Value("${telegram.chat-id:}")
 	private String chatId;
 

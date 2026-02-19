@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/purchase-orders") // * Base path via application.yaml
 @RequiredArgsConstructor
-@Tag(name = "Purchase Order", description = "Purchase Order Management")
+@Tag(name = "5. Purchase Order")
 @SecurityRequirement(name = "BearerAuth")
 public class PurchaseOrderController {
 

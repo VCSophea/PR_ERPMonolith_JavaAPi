@@ -1,6 +1,6 @@
 package com.udaya.controller;
 
-import com.udaya.dto.common.BaseSearchRequest;
+import com.udaya.dto.common.BaseFilterRequest;
 import com.udaya.model.PurchaseOrder;
 import com.udaya.response.BaseResponse;
 import com.udaya.response.Pagination;
@@ -29,12 +29,12 @@ public class PurchaseOrderController {
 	@PostMapping("/list")
 	@Operation(summary = "Get All POs with Pagination")
 	@RequiresPermission(module = "Purchase Order", action = "View")
-	public ResponseEntity<BaseResponse<Object>> getAll(@RequestBody BaseSearchRequest request) {
+	public ResponseEntity<BaseResponse<Object>> getAll(@RequestBody BaseFilterRequest request) {
 
 		Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(), Sort.by("id").descending());
 		Page<PurchaseOrder> poPage = poService.getAll(pageable, request.getKeyword());
 
-		Pagination pagination = Pagination.builder().page(request.getPage()).rowsPerPage(request.getSize()).total(poPage.getTotalElements()).build();
+		Pagination pagination = Pagination.builder().page(request.getPage()).size(request.getSize()).total(poPage.getTotalElements()).build();
 
 		return ResponseEntity.ok(BaseResponse.success(poPage.getContent(), pagination));
 	}

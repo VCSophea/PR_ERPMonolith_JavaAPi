@@ -1,6 +1,6 @@
 package com.udaya.controller;
 
-import com.udaya.dto.common.BaseSearchRequest;
+import com.udaya.dto.common.BaseFilterRequest;
 import com.udaya.model.Group;
 import com.udaya.response.BaseResponse;
 import com.udaya.security.RequiresPermission;
@@ -24,7 +24,7 @@ public class GroupController {
 	@PostMapping("/list")
 	@RequiresPermission(module = "Group", action = "View")
 	@Operation(summary = "Get all active groups")
-	public ResponseEntity<BaseResponse<List<Group>>> getAllActiveGroups(@RequestBody(required = false) BaseSearchRequest request) {
+	public ResponseEntity<BaseResponse<List<Group>>> getAllActiveGroups(@RequestBody(required = false) BaseFilterRequest request) {
 		String keyword = (request != null) ? request.getKeyword() : null;
 		return ResponseEntity.ok(BaseResponse.success(groupService.getAllActiveGroups(keyword)));
 	}

@@ -1,29 +1,16 @@
 package com.udaya.dto.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.util.List;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateRequest {
-
+@EqualsAndHashCode(callSuper = true)
+public class UserUpdateRequest extends UserCreateRequest {
 	private Long id;
-	private String email;
-	private List<Long> groupIds;
-	private String fullName;
-	private String firstName;
-	private String lastName;
-	private String sex;
-	private LocalDate dob;
-	private String address;
-	private String telephone;
-	private String photo;
-	private Integer isActive;
 }

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Pagination {
 	private int page;
-	private int rowsPerPage;
+	private int size;
 	private long total;
 }

@@ -39,7 +39,7 @@ public class UserMapper {
 		           .username(req.getUsername())
 		           .email(req.getEmail())
 		           .password(req.getPassword())
-		           .role("USER")
+		           .role(req.getRole())
 		           .fullName(req.getFullName())
 		           .firstName(req.getFirstName())
 		           .lastName(req.getLastName())
@@ -47,6 +47,8 @@ public class UserMapper {
 		           .dob(req.getDob())
 		           .address(req.getAddress())
 		           .telephone(req.getTelephone())
+		           .photo(req.getPhoto())
+		           .isActive(1)
 		           .created(LocalDateTime.now())
 		           .build();
 	}
@@ -54,7 +56,9 @@ public class UserMapper {
 	public void updateUserFromRequest(UserUpdateRequest req, User user) {
 		if (req == null || user == null) return;
 
+		if (req.getUsername() != null) user.setUsername(req.getUsername());
 		if (req.getEmail() != null) user.setEmail(req.getEmail());
+		if (req.getRole() != null) user.setRole(req.getRole());
 		if (req.getFullName() != null) user.setFullName(req.getFullName());
 		if (req.getFirstName() != null) user.setFirstName(req.getFirstName());
 		if (req.getLastName() != null) user.setLastName(req.getLastName());
@@ -63,7 +67,6 @@ public class UserMapper {
 		if (req.getAddress() != null) user.setAddress(req.getAddress());
 		if (req.getTelephone() != null) user.setTelephone(req.getTelephone());
 		if (req.getPhoto() != null) user.setPhoto(req.getPhoto());
-		if (req.getIsActive() != null) user.setIsActive(req.getIsActive());
 
 		user.setModified(LocalDateTime.now());
 	}

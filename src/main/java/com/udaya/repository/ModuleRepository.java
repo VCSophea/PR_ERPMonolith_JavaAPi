@@ -41,4 +41,8 @@ public class ModuleRepository {
 	public Optional<Module> findById(Long id) {
 		return dsl.selectFrom(table("modules")).where(field("id").eq(id)).fetchOptionalInto(Module.class);
 	}
+
+	public void save(Module module) {
+		dsl.insertInto(table("modules")).set(field("module_type_id"), module.getModuleTypeId()).set(field("name"), module.getName()).set(field("ordering"), module.getOrdering()).set(field("status"), 1).execute();
+	}
 }

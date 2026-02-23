@@ -1,8 +1,11 @@
 package com.udaya.service;
 
+import com.udaya.dto.common.ModuleCreateRequest;
 import com.udaya.model.Module;
+import com.udaya.model.ModuleType;
 import com.udaya.model.Permission;
 import com.udaya.repository.ModuleRepository;
+import com.udaya.repository.ModuleTypeRepository;
 import com.udaya.repository.PermissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class PermissionService {
 
 	private final PermissionRepository permissionRepository;
 	private final ModuleRepository moduleRepository;
+	private final ModuleTypeRepository moduleTypeRepository;
 
 	public boolean checkUserHasPermission(Long userId, String moduleName) {
 		return moduleRepository.findByName(moduleName).map(module -> permissionRepository.userHasModuleAccess(userId, module.getId())).orElse(false);
@@ -56,5 +60,18 @@ public class PermissionService {
 	@Transactional
 	public void revokePermissionFromGroup(Long groupId, Long moduleId) {
 		permissionRepository.revokePermission(groupId, moduleId);
+	}
+
+	@Transactional
+	public void createModuleSet(ModuleCreateRequest request) {
+		// * Create Module Type & associated Child Modules
+		Long typeId = moduleTypeRepository.save(ModuleType.builder().name(request.getName()).ordering(0).build());
+
+		if (request.getModules() != null) {
+			for (int i = 0; i < request.getModules().size(); i++) {
+				ModuleCreateRequest.ModuleDetail m = request.getModules().get(i);
+				moduleRepository.save(Module.builder().moduleTypeId(typeId).name(m.getName()).type(m.getType()).ordering(i).build());
+			}
+		}
 	}
 }

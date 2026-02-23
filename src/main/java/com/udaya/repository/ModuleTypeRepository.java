@@ -19,4 +19,8 @@ public class ModuleTypeRepository {
 	public List<ModuleType> findAll() {
 		return dsl.selectFrom(table("module_types")).orderBy(field("ordering")).fetchInto(ModuleType.class);
 	}
+
+	public Long save(ModuleType type) {
+		return dsl.insertInto(table("module_types")).set(field("name"), type.getName()).set(field("ordering"), type.getOrdering()).set(field("status"), 1).returningResult(field("id", Long.class)).fetchOne(field("id", Long.class));
+	}
 }

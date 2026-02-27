@@ -15,9 +15,7 @@ const die = (msg) => {
   process.exit(1);
 };
 
-// * Validate Params
-const env = process.argv[2];
-if (!["qa", "prod", "docker-local", "docker-prod"].includes(env)) die("Usage: node scripts/build.js <qa|prod|docker-local|docker-prod>");
+const isDocker = process.argv[2] === "docker";
 
 // * 1. Configuration
 let config = { ...JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")) }; // loads name, version
@@ -26,12 +24,13 @@ try {
     const envData = readFileSync(path.join(root, ".env"), "utf8");
     config.version = envData.match(/^APP_VERSION=(.*)/m)?.[1]?.trim() || config.version;
     config.projectName = envData.match(/^PROJECT_NAME=(.*)/m)?.[1]?.trim() || config.name; // Use projectName for <name>
+    config.appEnv = envData.match(/^APP_ENV=(.*)/m)?.[1]?.trim() || "dev";
   }
 } catch (e) {
   die("Config load failed: " + e.message);
 }
 
-console.log(`� Build: ${config.projectName} (Artifact: ${config.name}, Version: ${config.version}) [${env}]`);
+console.log(` Build: ${config.projectName} (Artifact: ${config.name}, Version: ${config.version}) [${config.appEnv}]`);
 
 // * 2. Sync pom.xml
 try {
@@ -68,14 +67,14 @@ copyFileSync(path.join(target, jar), path.join(releaseDir, `${config.name}.jar`)
 copyFileSync(path.join(target, jar), path.join(target, "docker.jar")); // Standardize for Docker
 console.log(`✅ Jar created: ${config.name}.jar`);
 
-// * 5. Docker Build (If requested)
-if (env.includes("docker")) {
-  console.log("🐳 Docker Build...");
-  const tag = env === "docker-prod" ? config.version : "latest";
-  run(`docker build -t ${config.name}:${tag} .`);
+// * 5. Handle Next Steps
+if (isDocker) {
+  console.log("🐳 Starting Docker containers...");
+  run(`COMPOSE_PROJECT_NAME=${config.name} docker compose up -d --build`);
+  console.log("✅ Docker is up and running!");
 } else {
-  // * 6. Zip Release (QA/Prod)
-  console.log("📦 Zipping...");
+  // * 6. Zip Release
+  console.log("📦 Zipping Release...");
   const zipName = `${releaseName}.zip`;
   const zipPath = path.join(root, "release", zipName);
 

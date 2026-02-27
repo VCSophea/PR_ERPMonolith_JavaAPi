@@ -11,7 +11,7 @@
 	<groupId>com.udaya</groupId>
 	<artifactId>erp-monolith</artifactId>
 	<version>1.0.0</version>
-	<name>ERP Monolith API</name>
+	<name>erp-monolith</name>
 	<description>ERP Monolith API</description>
 	<url/>
 	<licenses>

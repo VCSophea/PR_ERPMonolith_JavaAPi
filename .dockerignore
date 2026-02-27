@@ -1,6 +1,10 @@
-target/original-*.jar
-node_modules
+target/
 .git
+.idea
 .env
 release
 scripts
+*.md
+node_modules
+.DS_Store
+*.log

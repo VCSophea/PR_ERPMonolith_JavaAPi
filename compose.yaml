@@ -1,0 +1,19 @@
+name: erp-monolith
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-monolith-api
+    ports:
+      - "9090:9090"
+    env_file:
+      - .env
+    networks:
+      - erp_private_net
+    restart: unless-stopped
+
+networks:
+  erp_private_net:
+    driver: bridge

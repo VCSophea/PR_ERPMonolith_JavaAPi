@@ -46,14 +46,23 @@ The application uses a centralized **`.env`** file for configuration. Create thi
 # Application Metadata
 APP_VERSION=1.0.0
 PROJECT_NAME="Sales ERP Monolith"
+APP_ENV=dev
 
 # Server
 SERVER_PORT=9090
 
-# Database
-DB_URL=jdbc:mysql://localhost:3306/1074_NewLink_DBA?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
-DB_USERNAME=root
-DB_PASSWORD=your_password
+# Database URLs (Based on active APP_ENV profile)
+DB_URL_LOCAL=jdbc:mysql://localhost:3306/1074_NewLink_DBA_Local?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+DB_URL_DEV=jdbc:mysql://dev-server:3306/1074_NewLink_DBA_Dev?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+DB_URL_QA=jdbc:mysql://qa-server:3306/qa_db?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+DB_URL_PROD=jdbc:mysql://prod-server:3306/prod_db?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+
+# Database Credentials
+DB_USERNAME_LOCAL=root
+DB_PASSWORD_LOCAL=root
+DB_USERNAME_DEV=dev_user
+DB_PASSWORD_DEV=dev_password
+# ... QA & PROD ...
 
 # JWT
 JWT_SECRET=your_very_long_secret_key_needs_to_be_secure
@@ -79,48 +88,34 @@ TELEGRAM_CHAT_ID=your_chat_id
 To start the application in development mode:
 
 ```bash
-# Install dependencies (mvn) and run
-yarn start
-# OR
-npm run start
+# Run Maven Spring Boot target
+npm run dev
 ```
 
-_App will start on port `9090`._
+_App will start on port `9090` taking database properties mapped to the value in `APP_ENV` ._
 
 ### 2. Build for Production (Artifact)
 
 Generates a deployable ZIP file in `release/`:
 
 ```bash
-# QA / Testing Build
-yarn build:qa
-
-# Production Build
-yarn build:prod
+# General Build (using current APP_ENV value to generate properties)
+npm run build
 ```
 
 ### 3. Docker Build & Run
 
-Build a Docker image using the integrated script:
+Build and run a multi-stage Docker container utilizing docker compose.
 
 ```bash
-# Build Local Image (Tag: latest)
-yarn build:docker:local
-
-# Build Prod Image (Tag: <version>)
-yarn build:docker:prod
+npm run docker
 ```
 
-**Run Docker Container:**
-_Note: `host.docker.internal` allows the container to access your host's MySQL._
+**Run Docker Container Manually:**
+_Note: `COMPOSE_PROJECT_NAME` derives the container name flexibly._
 
 ```bash
-docker run -d \
-  -p 9091:9090 \
-  --name erp-monolith \
-  --env-file .env \
-  -e DB_URL="jdbc:mysql://host.docker.internal:3306/1074_NewLink_DBA?..." \
-  erp-monolith:latest
+COMPOSE_PROJECT_NAME=erp-monolith docker compose up -d --build
 ```
 
 ---
